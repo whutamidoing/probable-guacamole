@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User { 
+  id            String   @id @default(uuid())
+  email         String   @unique
+  userName      String   @unique
+  fName         String?
+  lName         String?
+  profileImg    String?
+  bannerImg     String?
+  posts         Post[]
+} 
+model Post { 
+  id         Int       @id @default(autoincrement()) 
+  title      String
+  content    String?
+  tags       String[]
+  images     String[]
+  createdAt  DateTime  @default(now())
+  status     String    @default("draft")
+  authorId   String
+  author     User      @relation(fields: [authorId], references: [id]) 
+  viewers    Viewers[]
+  comments   Comment[]
+  likes      PostLike[]
+}
+model Comment {
+  id         Int       @id @default(autoincrement())
+  content    String
+  createdAt  DateTime  @default(now())
+  postId     Int
+  post       Post      @relation(fields: [postId], references: [id])
+  likes      CommentLike[]
+}
+model Viewers {
+  id         Int       @id @default(autoincrement())
+  postId     Int
+  viewerId   String
+  post       Post      @relation(fields: [postId], references: [id])
+}
+model PostLike {
+  id         Int       @id @default(autoincrement())
+  isLike     Boolean   @default(true)
+  postId     Int
+  likerId    String
+  post       Post      @relation(fields: [postId], references: [id])
+  @@unique([postId, likerId])
+}
+model CommentLike {
+  id         Int       @id @default(autoincrement())
+  isLike     Boolean   @default(true)
+  commentId     Int
+  likerId    String
+  comment    Comment   @relation(fields: [commentId], references: [id])
+  @@unique([commentId, likerId])
+}
