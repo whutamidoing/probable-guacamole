@@ -39,5 +39,6 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-  return Response.json({ message: "hello" });
+  const users = await prisma.user.findMany();
+  return NextResponse.json(users);
 }
