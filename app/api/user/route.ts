@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     console.log("Body received:", body);
     let { userName, email, fName, lName, profileImg, bannerImg } = body;
 
-    if (!fName || !lName || !email) {
+    if (!userName || !email) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
