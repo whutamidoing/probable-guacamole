@@ -27,6 +27,7 @@ export async function POST(req: Request) {
         data: { userName, email, fName, lName, profileImg, bannerImg },
       });
     }
+    console.log("USER CREATED");
 
     return NextResponse.json(user);
   } catch (error) {
