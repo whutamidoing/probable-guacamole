@@ -5,9 +5,10 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("Body received:", body);
-    let { userName, email, fName, lName, profileImg, bannerImg } = body;
+    let { id, userName, email, fName, lName, profileImg, bannerImg } = body;
 
     if (!userName || !email) {
+      console.error("Missing required fields: userName or email");
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -18,16 +19,16 @@ export async function POST(req: Request) {
       where: { email: email },
     });
 
-    if (!user?.userName) {
-      userName = fName + " " + lName;
-    }
-
     if (!user) {
+      console.log("USER CREATED");
       user = await prisma.user.create({
-        data: { userName, email, fName, lName, profileImg, bannerImg },
+        data: { id, userName, email, fName, lName, profileImg, bannerImg },
       });
     }
-    console.log("USER CREATED");
+
+    if (user) {
+      console.log("USER ALREADY EXISTS");
+    }
 
     return NextResponse.json(user);
   } catch (error) {
