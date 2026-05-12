@@ -15,12 +15,14 @@ model User {
   id            String   @id @default(uuid())
   email         String   @unique
   userName      String   @unique
+  bio           String?
   fName         String?
   lName         String?
   profileImg    String?
   bannerImg     String?
   posts         Post[]
-} 
+  friends       Friends[]
+}
 model Post { 
   id         Int       @id @default(autoincrement()) 
   title      String
@@ -42,6 +44,11 @@ model Comment {
   postId     Int
   post       Post      @relation(fields: [postId], references: [id])
   likes      CommentLike[]
+}
+model Friends {
+  id         Int       @id @default(autoincrement())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id]) 
 }
 model Viewers {
   id         Int       @id @default(autoincrement())
