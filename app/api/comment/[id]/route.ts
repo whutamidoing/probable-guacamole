@@ -3,19 +3,19 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: number }> },
 ) {
   const { id } = await params;
 
-  const user = await prisma.user.findUnique({
+  const comment = await prisma.comment.findUnique({
     where: { id },
   });
 
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!comment) {
+    return NextResponse.json({ error: "comment not found" }, { status: 404 });
   }
 
-  return NextResponse.json(user);
+  return NextResponse.json(comment);
 }
 
 export async function PATCH(
@@ -25,27 +25,27 @@ export async function PATCH(
   try {
     const body = await req.json();
     console.log("Body received:", body);
-    let { fName, lName, bio, profileImg, bannerImg } = body;
+    let {content} = body;
 
-    if (!fName && !lName && !bio && !profileImg && !bannerImg) {
+    if (!content) {
       console.error("No change to add");
       return NextResponse.json({ error: "No change to add" }, { status: 400 });
     }
 
     const { id } = await params;
 
-    const user = await prisma.user.update({
+    const comment = await prisma.comment.update({
       where: { id },
-      data: { fName, lName, bio, profileImg, bannerImg },
+      data: { content },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!comment) {
+      return NextResponse.json({ error: "Comment not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json(comment);
   } catch (error) {
-    console.error("POST /api/user error:", error);
+    console.error("POST /api/comments/[id] error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 },

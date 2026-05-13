@@ -27,3 +27,8 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET() {
+  const comments = await prisma.post.findMany();
+  return NextResponse.json(comments);
+}

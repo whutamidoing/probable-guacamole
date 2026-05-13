@@ -21,8 +21,10 @@ model User {
   profileImg    String?
   bannerImg     String?
   posts         Post[]
-  friends       Friends[]
+  sentRequests     Friend[] @relation("SentFriendReq")
+  receivedRequests Friend[] @relation("ReceivedFriendReq")
 }
+
 model Post { 
   id         Int       @id @default(autoincrement()) 
   title      String
@@ -45,23 +47,35 @@ model Comment {
   post       Post      @relation(fields: [postId], references: [id])
   likes      CommentLike[]
 }
-model Friends {
+model Notifications {
+  id         Int      @id @default(autoincrement())
+  content    String
+  link       String
+  createdAt  DateTime  @default(now())
+}
+model Friend {
   id         Int       @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  status      String   @default("PENDING")
   userId     String
-  user       User      @relation(fields: [userId], references: [id]) 
+  user       User      @relation("SentFriendReq", fields: [userId], references: [id]) 
+  receiverId  String
+  receiver    User     @relation("ReceivedFriendReq", fields: [receiverId], references: [id])
+  @@unique([userId, receiverId]) 
 }
 model Viewers {
   id         Int       @id @default(autoincrement())
   postId     Int
   viewerId   String
   post       Post      @relation(fields: [postId], references: [id])
+  @@unique([postId, viewerId])
 }
 model PostLike {
   id         Int       @id @default(autoincrement())
   isLike     Boolean   @default(true)
   postId     Int
   likerId    String
-  post       Post      @relation(fields: [postId], references: [id])
+  post       Post      @relation(fields: [postId], references: [id]) 
   @@unique([postId, likerId])
 }
 model CommentLike {
@@ -69,6 +83,6 @@ model CommentLike {
   isLike     Boolean   @default(true)
   commentId     Int
   likerId    String
-  comment    Comment   @relation(fields: [commentId], references: [id])
+  comment    Comment   @relation(fields: [commentId], references: [id]) 
   @@unique([commentId, likerId])
 }
