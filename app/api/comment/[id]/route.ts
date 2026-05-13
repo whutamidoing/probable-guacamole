@@ -20,12 +20,12 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: number }> },
 ) {
   try {
     const body = await req.json();
     console.log("Body received:", body);
-    let {content} = body;
+    let { content } = body;
 
     if (!content) {
       console.error("No change to add");
