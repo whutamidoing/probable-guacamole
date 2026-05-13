@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: number }> },
+  { params }: { params: { id: string } },
 ) {
-  const { id } = await params;
+  const id = Number(params.id);
 
   const comment = await prisma.comment.findUnique({
     where: { id },
@@ -20,7 +20,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: number }> },
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await req.json();
@@ -32,7 +32,7 @@ export async function PATCH(
       return NextResponse.json({ error: "No change to add" }, { status: 400 });
     }
 
-    const { id } = await params;
+    const id = Number(params.id);
 
     const comment = await prisma.comment.update({
       where: { id },
