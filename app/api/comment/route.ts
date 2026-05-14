@@ -1,13 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
-
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log("Body received:", body);
@@ -24,7 +18,7 @@ export async function POST(req: Request) {
       data: { content, post },
     });
 
-    return NextResponse.json(comment, { headers: corsHeaders });
+    return NextResponse.json(comment);
   } catch (error) {
     console.error("POST /api/users error:", error);
     return NextResponse.json(
@@ -36,5 +30,5 @@ export async function POST(req: Request) {
 
 export async function GET() {
   const comments = await prisma.post.findMany();
-  return NextResponse.json(comments, { headers: corsHeaders });
+  return NextResponse.json(comments);
 }
