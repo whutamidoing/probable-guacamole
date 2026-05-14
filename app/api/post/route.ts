@@ -18,11 +18,21 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log("Body received:", body);
-    const { title, content, tags, images, author } = body;
+    const { title, content, tags, images, authorId } = body;
 
-    if (!title || !content || !author) {
+    if (!title || !content || !authorId) {
+      console.log("Missing fields!");
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields!" },
+        { status: 400 },
+      );
+    }
+    let author = await prisma.user.findUnique({ where: { id: authorId } });
+
+    if (!author) {
+      console.log("Author not found!");
+      return NextResponse.json(
+        { error: "Author does not Exist!" },
         { status: 400 },
       );
     }
@@ -33,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (!post) {
       post = await prisma.post.create({
-        data: { title, content, tags, images, author },
+        data: { title, content, tags, images, authorId },
       });
     }
 
