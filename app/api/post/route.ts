@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log("Body received:", body);
-    const { title, content, tags, images, authorId } = body;
+    const { title, content, tags, images, authorId, status } = body;
 
     if (!title || !content || !authorId) {
       console.log("Missing fields!");
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (!post) {
       post = await prisma.post.create({
-        data: { title, content, tags, images, authorId },
+        data: { title, content, tags, images, authorId, status },
       });
     }
 
@@ -57,7 +57,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  const posts = await prisma.post.findMany();
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const authorId = searchParams.get("authorId");
+
+  const posts = await prisma.post.findMany({
+    where: authorId ? { authorId } : undefined,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
   return NextResponse.json(posts);
 }
