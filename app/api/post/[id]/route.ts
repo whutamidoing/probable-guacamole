@@ -1,6 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -16,7 +22,7 @@ export async function GET(
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  return NextResponse.json(post);
+  return NextResponse.json(post, { headers: corsHeaders });
 }
 
 export async function PATCH(
@@ -45,7 +51,7 @@ export async function PATCH(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(post);
+    return NextResponse.json(post, { headers: corsHeaders });
   } catch (error) {
     console.error("POST /api/post/[id] error:", error);
     return NextResponse.json(

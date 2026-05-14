@@ -1,5 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
+import { headers } from "next/headers";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
 export async function GET(
   req: NextRequest,
@@ -16,7 +23,7 @@ export async function GET(
     return NextResponse.json({ error: "comment not found" }, { status: 404 });
   }
 
-  return NextResponse.json(comment);
+  return NextResponse.json(comment, { headers: corsHeaders });
 }
 
 export async function PATCH(
@@ -45,7 +52,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Comment not found" }, { status: 404 });
     }
 
-    return NextResponse.json(comment);
+    return NextResponse.json(comment, { headers: corsHeaders });
   } catch (error) {
     console.error("POST /api/comments/[id] error:", error);
     return NextResponse.json(

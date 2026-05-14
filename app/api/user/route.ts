@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -30,7 +36,7 @@ export async function POST(req: Request) {
       console.log("USER ALREADY EXISTS");
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json(user, { headers: corsHeaders });
   } catch (error) {
     console.error("POST /api/user error:", error);
     return NextResponse.json(
@@ -42,5 +48,5 @@ export async function POST(req: Request) {
 
 export async function GET() {
   const users = await prisma.user.findMany();
-  return NextResponse.json(users);
+  return NextResponse.json(users, { headers: corsHeaders });
 }
