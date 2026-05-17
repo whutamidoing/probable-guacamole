@@ -4,9 +4,10 @@ import { getUserId } from "@/lib/auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const postId = Number(params.id);
+  const { id } = await params;
+  const postId = Number(id);
   const userId = await getUserId(req);
   const body = await req.json();
   console.log("Body received:", body);
