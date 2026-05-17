@@ -1,17 +1,10 @@
-import { verifyToken } from "@clerk/backend";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-export async function getUserId(req: Request) {
-  const authHeader = req.headers.get("authorization");
+export async function POST(req: NextRequest) {
+  const { userId } = await auth();
 
-  if (!authHeader) {
-    throw new Error("Missing Authorization header");
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const token = authHeader.replace("Bearer ", "");
-
-  const payload = await verifyToken(token, {
-    secretKey: process.env.CLERK_SECRET_KEY!,
-  });
-
-  return payload.sub;
 }

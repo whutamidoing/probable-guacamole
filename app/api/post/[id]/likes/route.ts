@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { getUserId } from "@/lib/auth";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const { userId } = await auth();
   const { id } = await params;
   const postId = Number(id);
-  const userId = await getUserId(req);
   const body = await req.json();
   console.log("Body received:", body);
   const { type } = body;
+
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const existing = await prisma.postLike.findUnique({
     where: {
