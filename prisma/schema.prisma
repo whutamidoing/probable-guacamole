@@ -12,32 +12,34 @@ datasource db {
 }
 
 model User { 
-  id            String   @id @default(uuid())
-  email         String   @unique
-  userName      String   @unique
-  bio           String?
-  fName         String?
-  lName         String?
-  profileImg    String?
-  bannerImg     String?
-  posts         Post[]
+  id               String   @id @default(uuid())
+  email            String   @unique
+  userName         String   @unique
+  bio              String?
+  fName            String?
+  lName            String?
+  profileImg       String?
+  bannerImg        String?
+  posts            Post[]
+  likedPost        PostLike[]
+  likedComments    CommentLike[]
   sentRequests     Friend[] @relation("SentFriendReq")
   receivedRequests Friend[] @relation("ReceivedFriendReq")
 }
 
 model Post { 
-  id         Int       @id @default(autoincrement()) 
-  title      String
-  content    String?
-  tags       String[]
-  images     String[]
-  createdAt  DateTime  @default(now())
-  status     String    @default("draft")
-  authorId   String
-  author     User      @relation(fields: [authorId], references: [id]) 
-  viewers    Viewers[]
-  comments   Comment[]
-  likes      PostLike[]
+  id             Int       @id @default(autoincrement()) 
+  title          String
+  content        String?
+  tags           String[]
+  images         String[]
+  createdAt      DateTime  @default(now())
+  status         String    @default("draft")
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id]) 
+  viewers        Viewers[]
+  comments       Comment[]
+  likedPost      PostLike[]
 }
 model Comment {
   id         Int       @id @default(autoincrement())
@@ -54,11 +56,11 @@ model Notifications {
   createdAt  DateTime  @default(now())
 }
 model Friend {
-  id         Int       @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   createdAt   DateTime @default(now())
   status      String   @default("PENDING")
-  userId     String
-  user       User      @relation("SentFriendReq", fields: [userId], references: [id]) 
+  userId      String
+  user        User      @relation("SentFriendReq", fields: [userId], references: [id]) 
   receiverId  String
   receiver    User     @relation("ReceivedFriendReq", fields: [receiverId], references: [id])
   @@unique([userId, receiverId]) 
@@ -72,17 +74,19 @@ model Viewers {
 }
 model PostLike {
   id         Int       @id @default(autoincrement())
-  isLike     Boolean   @default(true)
+  type       String
   postId     Int
-  likerId    String
   post       Post      @relation(fields: [postId], references: [id]) 
+  likerId    String
+  liker      User     @relation(fields: [likerId], references: [id])
   @@unique([postId, likerId])
 }
 model CommentLike {
   id         Int       @id @default(autoincrement())
-  isLike     Boolean   @default(true)
-  commentId     Int
-  likerId    String
+  type       String
+  commentId  Int
   comment    Comment   @relation(fields: [commentId], references: [id]) 
+  likerId    String
+  liker      User     @relation(fields: [likerId], references: [id])
   @@unique([commentId, likerId])
 }
