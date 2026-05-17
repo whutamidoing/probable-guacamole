@@ -49,13 +49,3 @@ export async function POST(
 
   return NextResponse.json({ liked: true });
 }
-
-export async function GET(req: NextRequest) {
-  const like = await prisma.postLike.findMany();
-
-  if (!like) {
-    return NextResponse.json({ error: "Like not found" }, { status: 404 });
-  }
-
-  return NextResponse.json(like);
-}
