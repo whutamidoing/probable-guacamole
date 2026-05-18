@@ -61,19 +61,13 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const authorId = searchParams.get("authorId");
 
-  const posts = await prisma.post.findMany({
-    where: authorId ? { authorId } : undefined,
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      _count: {
-        select: {
-          likedPost: true,
-        },
-      },
-    },
-  });
+  const [posts, likesCount, likeRecord] = await Promise.all([
+    prisma.post.findMany({
+      where: authorId ? { authorId } : undefined,
+    }),
+    prisma.postLike.count(),
+    prisma.postLike.findMany(),
+  ]);
 
-  return NextResponse.json(posts);
+  return NextResponse.json({ ...posts, likesCount, isLiked: !!likeRecord });
 }
