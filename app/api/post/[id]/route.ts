@@ -10,6 +10,13 @@ export async function GET(
 
   const post = await prisma.post.findUnique({
     where: { id: numId },
+    include: {
+      _count: {
+        select: {
+          likedPost: true,
+        },
+      },
+    },
   });
 
   if (!post) {
