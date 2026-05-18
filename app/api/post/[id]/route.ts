@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
 export async function GET(
@@ -7,6 +8,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const numId = Number(id);
+  const { userId } = await auth();
 
   const post = await prisma.post.findUnique({
     where: { id: numId },
@@ -28,7 +30,11 @@ export async function GET(
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  return NextResponse.json(post);
+  return NextResponse.json({
+    ...post,
+    likesCount: post._count.likedPost,
+    isLiked: post.likedPost.some((l) => l.likerId === userId),
+  });
 }
 
 export async function PATCH(
