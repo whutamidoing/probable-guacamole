@@ -16,6 +16,11 @@ export async function GET(
           likedPost: true,
         },
       },
+      likedPost: {
+        select: {
+          likerId: true,
+        },
+      },
     },
   });
 
