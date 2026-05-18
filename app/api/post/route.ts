@@ -12,10 +12,16 @@ export const prisma = new PrismaClient({
 */
 
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     console.log("Body received:", body);
     const { title, content, tags, images, authorId, status } = body;
@@ -58,16 +64,39 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const { searchParams } = new URL(req.url);
   const authorId = searchParams.get("authorId");
 
-  const [posts, likesCount, likeRecord] = await Promise.all([
-    prisma.post.findMany({
-      where: authorId ? { authorId } : undefined,
-    }),
-    prisma.postLike.count(),
-    prisma.postLike.findMany(),
-  ]);
+  const posts = await prisma.post.findMany({
+    where: authorId ? { authorId } : undefined,
+  });
 
-  return NextResponse.json({ ...posts, likesCount, isLiked: !!likeRecord });
+  const postsWithLikes = await Promise.all(
+    posts.map(async (post) => {
+      const likesCount = await prisma.postLike.count({
+        where: { postId: post.id },
+      });
+
+      const isLiked = await prisma.postLike.findUnique({
+        where: {
+          postId_likerId: {
+            postId: post.id,
+            likerId: userId,
+          },
+        },
+      });
+
+      return {
+        ...post,
+        likesCount,
+        isLiked: !!isLiked,
+      };
+    }),
+  );
+
+  return NextResponse.json(postsWithLikes);
 }
