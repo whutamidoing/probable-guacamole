@@ -6,35 +6,39 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-  const numId = Number(id);
   const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const likesCount = await prisma.postLike.count({
-    where: { postId: numId },
-  });
-  const isLiked = await prisma.postLike.findUnique({
-    where: {
-      postId_likerId: {
-        postId: numId,
-        likerId: userId,
-      },
-    },
-  });
+  const { id } = await params;
+  const numId = Number(id);
 
-  const post = await prisma.post.findUnique({
-    where: { id: numId },
-  });
+  const [post, likesCount, likeRecord] = await Promise.all([
+    prisma.post.findUnique({
+      where: { id: numId },
+    }),
+
+    prisma.postLike.count({
+      where: { postId: numId },
+    }),
+
+    prisma.postLike.findUnique({
+      where: {
+        postId_likerId: {
+          postId: numId,
+          likerId: userId,
+        },
+      },
+    }),
+  ]);
 
   if (!post) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ ...post, likesCount, isLiked: !!isLiked });
+  return NextResponse.json({ ...post, likesCount, isLiked: !!likeRecord });
 }
 
 export async function PATCH(
