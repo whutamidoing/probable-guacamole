@@ -18,6 +18,7 @@ export async function GET(
   const [post, likesCount, likeRecord] = await Promise.all([
     prisma.post.findUnique({
       where: { id: numId },
+      include: { author: true },
     }),
 
     prisma.postLike.count({

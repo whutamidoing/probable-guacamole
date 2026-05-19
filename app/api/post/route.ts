@@ -68,11 +68,9 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { searchParams } = new URL(req.url);
-  const authorId = searchParams.get("authorId");
 
   const posts = await prisma.post.findMany({
-    where: authorId ? { authorId } : undefined,
+    include: { author: true },
   });
 
   const postsWithLikes = await Promise.all(
