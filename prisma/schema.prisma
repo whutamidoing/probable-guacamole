@@ -21,6 +21,7 @@ model User {
   profileImg       String?
   bannerImg        String?
   posts            Post[]
+  comments         Comment[]
   likedPost        PostLike[]
   likedComments    CommentLike[]
   sentRequests     Friend[] @relation("SentFriendReq")
@@ -42,12 +43,14 @@ model Post {
   likedPost      PostLike[]
 }
 model Comment {
-  id         Int       @id @default(autoincrement())
-  content    String
-  createdAt  DateTime  @default(now())
-  postId     Int
-  post       Post      @relation(fields: [postId], references: [id])
-  likes      CommentLike[]
+  id           Int            @id @default(autoincrement())
+  content      String
+  createdAt    DateTime       @default(now())
+  commenterId  String
+  commenter    User           @relation(fields: [commenterId], references: [id])
+  postId       Int
+  post         Post           @relation(fields: [postId], references: [id])
+  likes        CommentLike[]
 }
 model Notifications {
   id         Int      @id @default(autoincrement())
