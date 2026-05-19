@@ -42,10 +42,10 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
-  const commenterId = searchParams.get("commenterId");
+  const postId = Number(searchParams.get("postId"));
 
   const comments = await prisma.comment.findMany({
-    where: { commenterId: commenterId || undefined },
+    where: { postId: postId || undefined },
     include: { commenter: true },
   });
 
