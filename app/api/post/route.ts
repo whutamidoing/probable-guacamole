@@ -13,7 +13,7 @@ export const prisma = new PrismaClient({
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   try {
