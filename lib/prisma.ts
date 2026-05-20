@@ -9,6 +9,7 @@ export function getPrisma() {
       adapter: new PrismaPg({
         connectionString: process.env.DATABASE_URL!,
       }),
+      log: ["error"],
     });
   }
   return prisma;
