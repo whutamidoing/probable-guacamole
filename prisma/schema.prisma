@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
@@ -12,22 +11,23 @@ datasource db {
 }
 
 model User { 
-  id               String   @id @default(uuid())
-  email            String   @unique
-  userName         String   @unique
-  bio              String?
-  fName            String?
-  lName            String?
-  profileImg       String?
-  bannerImg        String?
-  posts            Post[]
-  comments         Comment[]
-  likedPost        PostLike[]
-  likedComments    CommentLike[]
-  sentRequests     Friend[] @relation("SentFriendReq")
-  receivedRequests Friend[] @relation("ReceivedFriendReq")
-}
+  id                String           @id @default(uuid())
+  email             String           @unique
+  userName          String           @unique
+  bio               String?
+  fName             String?
+  lName             String?
+  profileImg        String?
+  bannerImg         String?
+  posts             Post[]
+  comments          Comment[]
+  likedPost         PostLike[]
+  likedComments     CommentLike[]
+  sentRequests      Friend[]        @relation("SentFriendReq")
+  receivedRequests  Friend[]        @relation("ReceivedFriendReq")
 
+  groupMemberships GroupMember[]
+}
 model Post { 
   id             Int       @id @default(autoincrement()) 
   title          String
@@ -41,6 +41,8 @@ model Post {
   viewers        Viewers[]
   comments       Comment[]
   likedPost      PostLike[]
+  groupId        Int?
+  group          Group?      @relation(fields: [groupId], references: [id])
 }
 model Comment {
   id           Int            @id @default(autoincrement())
@@ -51,6 +53,26 @@ model Comment {
   postId       Int
   post         Post           @relation(fields: [postId], references: [id])
   likes        CommentLike[]
+}
+model Group{ 
+  id               Int      @id @default(autoincrement())
+  groupName        String   @unique
+  description      String
+  groupImg         String
+  bannerImg        String
+  groupThemes      String[]
+  posts            Post[]
+  groupMembers     GroupMember[]
+}
+model GroupMember{
+  memberId  String
+  member    User     @relation(fields: [memberId], references: [id])
+  groupId   Int
+  group     Group    @relation(fields: [groupId], references: [id])
+  joinedAt  DateTime @default(now())
+  role      String   @default("member")
+
+  @@id([memberId, groupId])
 }
 model Notifications {
   id         Int      @id @default(autoincrement())
