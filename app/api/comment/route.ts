@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/db";
+import { Comment } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
   });
 
   const commentsWithLikes = await Promise.all(
-    comments.map(async (comment) => {
+    comments.map(async (comment: Comment) => {
       const likesCount = await prisma.commentLike.count({
         where: { commentId: comment.id },
       });

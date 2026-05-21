@@ -13,7 +13,8 @@ export const prisma = new PrismaClient({
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/db";
+import { Post } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
   });
 
   const postsWithLikes = await Promise.all(
-    posts.map(async (post) => {
+    posts.map(async (post: Post) => {
       const likesCount = await prisma.postLike.count({
         where: { postId: post.id },
       });
