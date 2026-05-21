@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
         description,
         groupImg,
         bannerImg,
-        members: {
+        groupMembers: {
           create: {
-            userId,
+            memberId: userId,
             role: "admin",
           },
         },
