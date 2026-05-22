@@ -105,6 +105,7 @@ export async function DELETE(
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
+    return NextResponse.json(post);
   } catch (error) {
     console.error("DELETE /api/post/[id] error:", error);
     return NextResponse.json(
