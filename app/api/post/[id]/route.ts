@@ -47,6 +47,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     console.log("Body received:", body);
     let { title, content, tags, images, status } = body;
@@ -83,17 +89,24 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { userId } = await auth();
 
-    const post = await prisma.user.delete({
-      where: { id },
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const numId = Number(id);
+
+    const post = await prisma.post.delete({
+      where: { id: numId },
     });
 
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
   } catch (error) {
-    console.error("POST /api/post/[id] error:", error);
+    console.error("DELETE /api/post/[id] error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 },

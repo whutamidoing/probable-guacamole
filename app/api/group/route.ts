@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
-import { Group, Post } from "@prisma/client";
+import { Group } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unmemberized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
