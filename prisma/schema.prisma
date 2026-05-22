@@ -51,7 +51,7 @@ model Comment {
   commenterId  String
   commenter    User           @relation(fields: [commenterId], references: [id])
   postId       Int
-  post         Post           @relation(fields: [postId], references: [id])
+  post         Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
   likes        CommentLike[]
 }
 model Group{ 
