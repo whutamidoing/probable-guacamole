@@ -101,7 +101,7 @@ model PostLike {
   id         Int       @id @default(autoincrement())
   type       String
   postId     Int
-  post       Post      @relation(fields: [postId], references: [id]) 
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade) 
   likerId    String
   liker      User     @relation(fields: [likerId], references: [id])
   @@unique([postId, likerId])
