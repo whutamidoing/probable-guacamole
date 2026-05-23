@@ -72,10 +72,13 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const authorId = searchParams.get("authorId");
-  const memberId = searchParams.get("memberId");
+  const groupId = searchParams.get("groupId");
 
   const posts = await prisma.post.findMany({
-    where: { authorId: authorId ?? undefined, memberId: memberId ?? undefined },
+    where: {
+      authorId: authorId ?? undefined,
+      groupId: Number(groupId) ?? undefined,
+    },
     include: {
       likedPost: {
         where: {
