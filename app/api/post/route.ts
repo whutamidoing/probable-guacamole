@@ -72,34 +72,33 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const authorId = searchParams.get("authorId");
+  const memberId = searchParams.get("memberId");
 
   const posts = await prisma.post.findMany({
-    where: { authorId: authorId || undefined },
-    include: { author: true },
+    where: { authorId: authorId ?? undefined, memberId: memberId ?? undefined },
+    include: {
+      likedPost: {
+        where: {
+          likerId: userId,
+        },
+        select: {
+          likerId: true,
+        },
+      },
+      _count: {
+        select: {
+          likedPost: true,
+        },
+      },
+    },
   });
 
-  const postsWithLikes = await Promise.all(
-    posts.map(async (post: Post) => {
-      const likesCount = await prisma.postLike.count({
-        where: { postId: post.id },
-      });
+  // Reshape response
+  const result = posts.map((post) => ({
+    ...post,
+    likesCount: post._count.likedPost,
+    isLiked: post.likedPost.length > 0,
+  }));
 
-      const isLiked = await prisma.postLike.findUnique({
-        where: {
-          postId_likerId: {
-            postId: post.id,
-            likerId: userId,
-          },
-        },
-      });
-
-      return {
-        ...post,
-        likesCount,
-        isLiked: !!isLiked,
-      };
-    }),
-  );
-
-  return NextResponse.json(postsWithLikes);
+  return NextResponse.json(result);
 }
