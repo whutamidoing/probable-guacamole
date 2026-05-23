@@ -81,6 +81,12 @@ export async function GET(req: NextRequest) {
       groupId: groupId ? Number(groupId) : undefined,
     },
     include: {
+      author: {
+        select: {
+          userName: true,
+          profileImg: true,
+        },
+      },
       likedPost: {
         where: {
           likerId: userId,
