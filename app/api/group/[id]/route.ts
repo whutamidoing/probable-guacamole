@@ -58,7 +58,7 @@ export async function PATCH(
     console.log("Body received:", body);
     let { groupName, description, groupImg, bannerImg, groupThemes } = body;
 
-    if (!groupName || !description || !groupImg || !bannerImg || !groupThemes) {
+    if (!groupName && !description && !groupImg && !bannerImg && !groupThemes) {
       console.error("No change to add");
       return NextResponse.json({ error: "No change to add" }, { status: 400 });
     }
