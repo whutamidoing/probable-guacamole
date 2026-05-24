@@ -74,6 +74,7 @@ export async function GET(req: NextRequest) {
         },
         select: {
           memberId: true,
+          role: true,
         },
       },
       _count: {
@@ -89,6 +90,7 @@ export async function GET(req: NextRequest) {
     ...group,
     populationCount: group._count.groupMembers,
     isFollowed: group.groupMembers.length > 0,
+    isAdmin: group?.groupMembers[0]?.role === "admin",
   }));
 
   return NextResponse.json(result);
