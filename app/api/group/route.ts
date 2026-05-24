@@ -65,25 +65,47 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const memberId = searchParams.get("memberId");
 
-  const groups = await prisma.group.findMany({
-    where: { groupMembers: { some: { memberId: memberId ?? undefined } } },
-    include: {
-      groupMembers: {
-        where: {
-          memberId: userId,
+  let groups;
+  if (memberId) {
+    groups = await prisma.group.findMany({
+      where: { groupMembers: { some: { memberId: memberId ?? undefined } } },
+      include: {
+        groupMembers: {
+          where: {
+            memberId: userId,
+          },
+          select: {
+            memberId: true,
+            role: true,
+          },
         },
-        select: {
-          memberId: true,
-          role: true,
+        _count: {
+          select: {
+            groupMembers: true,
+          },
         },
       },
-      _count: {
-        select: {
-          groupMembers: true,
+    });
+  } else {
+    groups = await prisma.group.findMany({
+      include: {
+        groupMembers: {
+          where: {
+            memberId: userId,
+          },
+          select: {
+            memberId: true,
+            role: true,
+          },
+        },
+        _count: {
+          select: {
+            groupMembers: true,
+          },
         },
       },
-    },
-  });
+    });
+  }
 
   // Reshape response
   const result = groups.map((group) => ({
