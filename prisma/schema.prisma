@@ -68,7 +68,7 @@ model GroupMember{
   memberId  String
   member    User     @relation(fields: [memberId], references: [id])
   groupId   Int
-  group     Group    @relation(fields: [groupId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   joinedAt  DateTime @default(now())
   role      String   @default("member")
 
