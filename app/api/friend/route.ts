@@ -64,35 +64,55 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const { userId } = await auth();
+  try {
+    const { userId } = await auth();
 
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const friends = await prisma.friend.findMany({
-    where: {
-      receiverId: userId,
-      status: "PENDING",
-    },
+    const friends = await prisma.friend.findMany({
+      where: {
+        status: "ACCEPTED",
+        OR: [{ userId }, { receiverId: userId }],
+      },
 
-    include: {
-      user: {
-        select: {
-          id: true,
-          userName: true,
-          profileImg: true,
+      include: {
+        receiver: {
+          select: {
+            id: true,
+            userName: true,
+            profileImg: true,
+          },
+        },
+
+        user: {
+          select: {
+            id: true,
+            userName: true,
+            profileImg: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  const result = friends.map((friend) => ({
-    id: friend.id,
-    status: friend.status,
+    const result = friends.map((friend) => {
+      const otherUser =
+        friend.userId === userId ? friend.receiver : friend.user;
 
-    sender: friend.user,
-  }));
+      return {
+        id: friend.id,
+        status: friend.status,
+        otherUser,
+      };
+    });
 
-  return NextResponse.json(result);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("FRIEND /api/friend/request error:", error);
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
+  }
 }
