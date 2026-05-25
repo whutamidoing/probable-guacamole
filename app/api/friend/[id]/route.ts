@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { memberId: string } },
+  { params }: { params: { id: string } },
 ) {
   try {
     const { userId } = await auth();
@@ -13,17 +13,17 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { memberId } = params;
+    const { id } = params;
 
     const friendship = await prisma.friend.findFirst({
       where: {
         OR: [
           {
             userId,
-            receiverId: memberId,
+            receiverId: id,
           },
           {
-            userId: memberId,
+            userId: id,
             receiverId: userId,
           },
         ],
