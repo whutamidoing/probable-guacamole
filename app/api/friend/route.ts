@@ -103,6 +103,7 @@ export async function GET() {
       return {
         id: friend.id,
         status: friend.status,
+        createdAt: friend.createdAt,
         otherUser,
       };
     });

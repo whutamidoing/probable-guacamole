@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: { memberId: string } },
 ) {
   try {
     const { userId } = await auth();
@@ -13,26 +13,43 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
+    const { memberId } = params;
 
-    const friend = await prisma.friend.findFirst({
+    const friendship = await prisma.friend.findFirst({
       where: {
         OR: [
           {
             userId,
-            receiverId: id,
+            receiverId: memberId,
           },
           {
-            userId: id,
+            userId: memberId,
             receiverId: userId,
           },
         ],
       },
+      include: {
+        receiver: {
+          select: {
+            id: true,
+            userName: true,
+            profileImg: true,
+          },
+        },
+
+        user: {
+          select: {
+            id: true,
+            userName: true,
+            profileImg: true,
+          },
+        },
+      },
     });
 
-    return NextResponse.json(friend);
+    return NextResponse.json(friendship); // null if none exists
   } catch (error) {
-    console.error("FRIEND /api/friend/[id] error:", error);
+    console.error("GET /api/friend/[id] error:", error);
 
     return NextResponse.json(
       { error: (error as Error).message },
