@@ -63,72 +63,36 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const { userId } = await auth();
+
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(req.url);
-  const accepted = searchParams.get("accepted") === "true";
+  const friends = await prisma.friend.findMany({
+    where: {
+      receiverId: userId,
+      status: "PENDING",
+    },
 
-  let friends;
-  if (accepted) {
-    friends = await prisma.friend.findMany({
-      where: {
-        status: "ACCEPTED",
-        OR: [{ userId }, { receiverId: userId }],
-      },
-      include: {
-        receiver: {
-          select: {
-            id: true,
-            userName: true,
-            profileImg: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            userName: true,
-            profileImg: true,
-          },
+    include: {
+      user: {
+        select: {
+          id: true,
+          userName: true,
+          profileImg: true,
         },
       },
-    });
-  } else {
-    friends = await prisma.friend.findMany({
-      where: {
-        OR: [{ userId }, { receiverId: userId }],
-      },
-      include: {
-        receiver: {
-          select: {
-            id: true,
-            userName: true,
-            profileImg: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            userName: true,
-            profileImg: true,
-          },
-        },
-      },
-    });
-  }
-
-  // Reshape response
-  const result = friends.map((friend) => {
-    const otherUser = friend.userId === userId ? friend.receiver : friend.user;
-
-    return {
-      id: friend.id,
-      status: friend.status,
-      otherUser,
-    };
+    },
   });
+
+  const result = friends.map((friend) => ({
+    id: friend.id,
+    status: friend.status,
+
+    sender: friend.user,
+  }));
+
   return NextResponse.json(result);
 }
