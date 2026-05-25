@@ -2,6 +2,45 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    const friend = await prisma.friend.findFirst({
+      where: {
+        OR: [
+          {
+            userId,
+            receiverId: id,
+          },
+          {
+            userId: id,
+            receiverId: userId,
+          },
+        ],
+      },
+    });
+
+    return NextResponse.json(friend);
+  } catch (error) {
+    console.error("FRIEND /api/friend/[id] error:", error);
+
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
+  }
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
