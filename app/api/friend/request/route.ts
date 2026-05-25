@@ -29,8 +29,7 @@ export async function GET() {
   const result = friends.map((friend) => ({
     id: friend.id,
     status: friend.status,
-
-    sender: friend.user,
+    otherUser: friend.user,
   }));
 
   return NextResponse.json(result);
