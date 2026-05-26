@@ -42,7 +42,7 @@ model Post {
   comments       Comment[]
   likedPost      PostLike[]
   groupId        Int?
-  group          Group?      @relation(fields: [groupId], references: [id])
+  group          Group?      @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 model Comment {
   id           Int            @id @default(autoincrement())
