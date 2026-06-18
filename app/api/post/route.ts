@@ -136,6 +136,19 @@ export async function GET(req: NextRequest) {
   //   headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
   // });
 
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
+  }
+
   const posts = await prisma.post.findMany();
   return NextResponse.json(posts, {
     headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
