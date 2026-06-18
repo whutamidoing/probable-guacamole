@@ -70,18 +70,17 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  return NextResponse.json(
-    { test: true },
-    {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    },
-  );
+  // return NextResponse.json(
+  //   { test: true },
+  //   {
+  //     headers: {
+  //       "Access-Control-Allow-Origin": "*",
+  //     },
+  //   },
+  // );
+
   // const { userId } = await auth();
   // if (!userId) {
-  //   console.log("userId:", userId);
-  //   console.log("auth header:", req.headers.get("authorization"));
   //   return NextResponse.json(
   //     { error: "Unauthorized" },
   //     {
@@ -136,6 +135,11 @@ export async function GET(req: NextRequest) {
   // return NextResponse.json(result, {
   //   headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
   // });
+
+  const posts = await prisma.post.findMany();
+  return NextResponse.json(posts, {
+    headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
+  });
 }
 
 export async function OPTIONS() {
