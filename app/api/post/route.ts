@@ -95,37 +95,40 @@ export async function GET(req: NextRequest) {
       authorId: authorId ? authorId : undefined,
       groupId: groupId ? Number(groupId) : undefined,
     },
-    include: {
-      author: {
-        select: {
-          userName: true,
-          profileImg: true,
-        },
-      },
-      likedPost: {
-        where: {
-          likerId: "user_3FGd58of3c0NrMyq2rl1mgIN8tm", // Replace with the actual userId from auth
-        },
-        select: {
-          likerId: true,
-        },
-      },
-      _count: {
-        select: {
-          likedPost: true,
-        },
-      },
-    },
+    // include: {
+    //   author: {
+    //     select: {
+    //       userName: true,
+    //       profileImg: true,
+    //     },
+    //   },
+    //   likedPost: {
+    //     where: {
+    //       likerId: "user_3FGd58of3c0NrMyq2rl1mgIN8tm", // Replace with the actual userId from auth
+    //     },
+    //     select: {
+    //       likerId: true,
+    //     },
+    //   },
+    //   _count: {
+    //     select: {
+    //       likedPost: true,
+    //     },
+    //   },
+    // },
   });
 
   // Reshape response
-  const result = posts.map((post) => ({
-    ...post,
-    likesCount: post._count.likedPost,
-    isLiked: post.likedPost.length > 0,
-  }));
+  // const result = posts.map((post) => ({
+  //   ...post,
+  //   likesCount: post._count.likedPost,
+  //   isLiked: post.likedPost.length > 0,
+  // }));
 
-  return NextResponse.json(result, {
+  // return NextResponse.json(result, {
+  //   headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
+  // });
+  return NextResponse.json(posts, {
     headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
   });
 }
