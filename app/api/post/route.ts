@@ -71,8 +71,18 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
+  console.log("userId:", userId);
+  console.log("auth header:", req.headers.get("authorization"));
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
   }
 
   const { searchParams } = new URL(req.url);
