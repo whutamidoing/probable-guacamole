@@ -1,6 +1,7 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
 export default clerkMiddleware(async (auth, req) => {
+  console.log("MIDDLEWARE HIT", req.method, req.nextUrl.pathname);
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,
