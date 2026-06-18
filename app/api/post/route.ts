@@ -137,6 +137,7 @@ export async function GET(req: NextRequest) {
   // });
 
   const { userId } = await auth();
+  console.log("GET /api/posts called, userId:", userId);
   if (!userId) {
     return NextResponse.json(
       { error: "Unauthorized" },
@@ -149,7 +150,16 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const posts = await prisma.post.findMany();
+  const { searchParams } = new URL(req.url);
+  const authorId = searchParams.get("authorId");
+  const groupId = searchParams.get("groupId");
+
+  const posts = await prisma.post.findMany({
+    where: {
+      authorId: authorId ? authorId : undefined,
+      groupId: groupId ? Number(groupId) : undefined,
+    },
+  });
   return NextResponse.json(posts, {
     headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
   });
