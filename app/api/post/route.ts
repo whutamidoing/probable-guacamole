@@ -70,20 +70,20 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
-    console.log("userId:", userId);
-    console.log("auth header:", req.headers.get("authorization"));
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      {
-        status: 401,
-        headers: {
-          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-        },
-      },
-    );
-  }
+  // const { userId } = await auth();
+  // if (!userId) {
+  //   console.log("userId:", userId);
+  //   console.log("auth header:", req.headers.get("authorization"));
+  //   return NextResponse.json(
+  //     { error: "Unauthorized" },
+  //     {
+  //       status: 401,
+  //       headers: {
+  //         "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+  //       },
+  //     },
+  //   );
+  // }
 
   const { searchParams } = new URL(req.url);
   const authorId = searchParams.get("authorId");
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
       },
       likedPost: {
         where: {
-          likerId: userId,
+          likerId: "user_3FGd58of3c0NrMyq2rl1mgIN8tm", // Replace with the actual userId from auth
         },
         select: {
           likerId: true,
