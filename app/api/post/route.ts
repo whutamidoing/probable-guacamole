@@ -70,6 +70,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  return NextResponse.json(
+    { test: true },
+    {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    },
+  );
   // const { userId } = await auth();
   // if (!userId) {
   //   console.log("userId:", userId);
@@ -84,41 +92,41 @@ export async function GET(req: NextRequest) {
   //     },
   //   );
   // }
-  console.log("GET /api/posts called");
+  // console.log("GET /api/posts called");
 
-  const { searchParams } = new URL(req.url);
-  const authorId = searchParams.get("authorId");
-  const groupId = searchParams.get("groupId");
+  // const { searchParams } = new URL(req.url);
+  // const authorId = searchParams.get("authorId");
+  // const groupId = searchParams.get("groupId");
 
-  const posts = await prisma.post.findMany({
-    where: {
-      authorId: authorId ? authorId : undefined,
-      groupId: groupId ? Number(groupId) : undefined,
-    },
-    // include: {
-    //   author: {
-    //     select: {
-    //       userName: true,
-    //       profileImg: true,
-    //     },
-    //   },
-    //   likedPost: {
-    //     where: {
-    //       likerId: "user_3FGd58of3c0NrMyq2rl1mgIN8tm", // Replace with the actual userId from auth
-    //     },
-    //     select: {
-    //       likerId: true,
-    //     },
-    //   },
-    //   _count: {
-    //     select: {
-    //       likedPost: true,
-    //     },
-    //   },
-    // },
-  });
+  // const posts = await prisma.post.findMany({
+  //   where: {
+  //     authorId: authorId ? authorId : undefined,
+  //     groupId: groupId ? Number(groupId) : undefined,
+  //   },
+  //   include: {
+  //     author: {
+  //       select: {
+  //         userName: true,
+  //         profileImg: true,
+  //       },
+  //     },
+  //     likedPost: {
+  //       where: {
+  //         likerId: userId,
+  //       },
+  //       select: {
+  //         likerId: true,
+  //       },
+  //     },
+  //     _count: {
+  //       select: {
+  //         likedPost: true,
+  //       },
+  //     },
+  //   },
+  // });
 
-  // Reshape response
+  // // Reshape response
   // const result = posts.map((post) => ({
   //   ...post,
   //   likesCount: post._count.likedPost,
@@ -128,9 +136,6 @@ export async function GET(req: NextRequest) {
   // return NextResponse.json(result, {
   //   headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
   // });
-  return NextResponse.json(posts, {
-    headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
-  });
 }
 
 export async function OPTIONS() {
