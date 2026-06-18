@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function OPTIONS() {
-  return new Response(null, {
+  return new Response("OK", {
     status: 200,
     headers: {
       "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
