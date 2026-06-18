@@ -84,6 +84,7 @@ export async function GET(req: NextRequest) {
   //     },
   //   );
   // }
+  console.log("GET /api/posts called");
 
   const { searchParams } = new URL(req.url);
   const authorId = searchParams.get("authorId");
