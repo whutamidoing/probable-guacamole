@@ -135,34 +135,76 @@ export async function GET(req: NextRequest) {
   // return NextResponse.json(result, {
   //   headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
   // });
+  try {
+    const { userId } = await auth();
+    console.log("GET /api/posts called, userId:", userId);
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
+    }
 
-  const { userId } = await auth();
-  console.log("GET /api/posts called, userId:", userId);
-  if (!userId) {
+    const { searchParams } = new URL(req.url);
+    const authorId = searchParams.get("authorId");
+    const groupId = searchParams.get("groupId");
+
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: authorId ? authorId : undefined,
+        groupId: groupId ? Number(groupId) : undefined,
+      },
+      include: {
+        author: {
+          select: {
+            userName: true,
+            profileImg: true,
+          },
+        },
+        likedPost: {
+          where: {
+            likerId: userId,
+          },
+          select: {
+            likerId: true,
+          },
+        },
+        _count: {
+          select: {
+            likedPost: true,
+          },
+        },
+      },
+    });
+    const result = posts.map((post) => ({
+      ...post,
+      likesCount: post._count.likedPost,
+      isLiked: post.likedPost.length > 0,
+    }));
+
+    return NextResponse.json(result, {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    });
+  } catch (err) {
+    console.error("GET ERROR:", err);
+
     return NextResponse.json(
-      { error: "Unauthorized" },
+      { error: String(err) },
       {
-        status: 401,
+        status: 500,
         headers: {
           "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
         },
       },
     );
   }
-
-  const { searchParams } = new URL(req.url);
-  const authorId = searchParams.get("authorId");
-  const groupId = searchParams.get("groupId");
-
-  const posts = await prisma.post.findMany({
-    where: {
-      authorId: authorId ? authorId : undefined,
-      groupId: groupId ? Number(groupId) : undefined,
-    },
-  });
-  return NextResponse.json(posts, {
-    headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
-  });
 }
 
 export async function OPTIONS() {
