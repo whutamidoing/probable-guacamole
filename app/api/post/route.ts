@@ -71,9 +71,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
-  console.log("userId:", userId);
-  console.log("auth header:", req.headers.get("authorization"));
   if (!userId) {
+    console.log("userId:", userId);
+    console.log("auth header:", req.headers.get("authorization"));
     return NextResponse.json(
       { error: "Unauthorized" },
       {
