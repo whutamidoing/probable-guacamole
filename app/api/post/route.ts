@@ -16,8 +16,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { Post } from "@prisma/client";
 
-const ALLOWED_ORIGIN =
-  process.env.NODE_ENV === "production" ? "https://app.example" : "*";
+const ALLOWED_ORIGIN = "*";
 
 export async function POST(req: NextRequest) {
   try {
