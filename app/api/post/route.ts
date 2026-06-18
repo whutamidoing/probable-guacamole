@@ -16,8 +16,13 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { Post } from "@prisma/client";
 
-const ALLOWED_ORIGIN =
-  process.env.NODE_ENV === "production" ? "https://app.example" : "*";
+const corsHeaders = {
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  },
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -113,19 +118,5 @@ export async function GET(req: NextRequest) {
     isLiked: post.likedPost.length > 0,
   }));
 
-  return NextResponse.json(result, {
-    headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
-  });
-}
-
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Allow-Credentials": "true",
-    },
-  });
+  return NextResponse.json(result, corsHeaders);
 }
