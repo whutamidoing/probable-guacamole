@@ -20,20 +20,6 @@ const ALLOWED_ORIGIN = "http://localhost:3000";
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    console.log("GET /api/posts called, userId:", userId);
-    if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        {
-          status: 401,
-          headers: {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-          },
-        },
-      );
-    }
-
     const body = await req.json();
     console.log("Body received:", body);
 
