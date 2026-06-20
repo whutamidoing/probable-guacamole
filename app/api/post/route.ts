@@ -21,8 +21,17 @@ const ALLOWED_ORIGIN = "http://localhost:3000";
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
+    console.log("GET /api/posts called, userId:", userId);
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const body = await req.json();
@@ -64,77 +73,17 @@ export async function POST(req: NextRequest) {
     console.error("POST /api/posts error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
 }
 
 export async function GET(req: NextRequest) {
-  // return NextResponse.json(
-  //   { test: true },
-  //   {
-  //     headers: {
-  //       "Access-Control-Allow-Origin": "*",
-  //     },
-  //   },
-  // );
-
-  // const { userId } = await auth();
-  // if (!userId) {
-  //   return NextResponse.json(
-  //     { error: "Unauthorized" },
-  //     {
-  //       status: 401,
-  //       headers: {
-  //         "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-  //       },
-  //     },
-  //   );
-  // }
-  // console.log("GET /api/posts called");
-
-  // const { searchParams } = new URL(req.url);
-  // const authorId = searchParams.get("authorId");
-  // const groupId = searchParams.get("groupId");
-
-  // const posts = await prisma.post.findMany({
-  //   where: {
-  //     authorId: authorId ? authorId : undefined,
-  //     groupId: groupId ? Number(groupId) : undefined,
-  //   },
-  //   include: {
-  //     author: {
-  //       select: {
-  //         userName: true,
-  //         profileImg: true,
-  //       },
-  //     },
-  //     likedPost: {
-  //       where: {
-  //         likerId: userId,
-  //       },
-  //       select: {
-  //         likerId: true,
-  //       },
-  //     },
-  //     _count: {
-  //       select: {
-  //         likedPost: true,
-  //       },
-  //     },
-  //   },
-  // });
-
-  // // Reshape response
-  // const result = posts.map((post) => ({
-  //   ...post,
-  //   likesCount: post._count.likedPost,
-  //   isLiked: post.likedPost.length > 0,
-  // }));
-
-  // return NextResponse.json(result, {
-  //   headers: { "Access-Control-Allow-Origin": ALLOWED_ORIGIN },
-  // });
   try {
     const { userId } = await auth();
     console.log("GET /api/posts called, userId:", userId);
