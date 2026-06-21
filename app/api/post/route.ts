@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     const { title, content, tags, images, authorId, status, groupId } = body;
 
-    if (!title || !content || !authorId) {
+    if (!title || !authorId || (!content && images.length === 0)) {
       console.log(
         `Missing fields! ${title ? "" : "title"} ${content ? "" : "content"} ${authorId ? "" : "authorId"}`,
       );
