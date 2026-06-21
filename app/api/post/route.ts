@@ -41,7 +41,9 @@ export async function POST(req: NextRequest) {
     const { title, content, tags, images, authorId, status, groupId } = body;
 
     if (!title || !content || !authorId) {
-      console.log("Missing fields!");
+      console.log(
+        `Missing fields! ${title ? "" : "title"} ${content ? "" : "content"} ${authorId ? "" : "authorId"}`,
+      );
       return NextResponse.json(
         { error: "Missing required fields!" },
         { status: 400 },
