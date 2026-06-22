@@ -147,20 +147,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        {
-          status: 401,
-          headers: {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-          },
-        },
-      );
-    }
-
     const { id } = await params;
     const numId = Number(id);
 
