@@ -8,40 +8,13 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      {
-        status: 401,
-        headers: {
-          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-        },
-      },
-    );
-  }
-
   const { id } = await params;
   const numId = Number(id);
 
-  const [post, likesCount, likeRecord] = await Promise.all([
+  const [post] = await Promise.all([
     prisma.post.findUnique({
       where: { id: numId },
       include: { author: true },
-    }),
-
-    prisma.postLike.count({
-      where: { postId: numId },
-    }),
-
-    prisma.postLike.findUnique({
-      where: {
-        postId_likerId: {
-          postId: numId,
-          likerId: userId,
-        },
-      },
     }),
   ]);
 
@@ -57,10 +30,7 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({
-    ...post,
-    likesCount,
-    isLiked: !!likeRecord,
+  return NextResponse.json(post, {
     headers: {
       "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
     },
