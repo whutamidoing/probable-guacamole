@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     if (!title || !authorId || (!content && images.length === 0)) {
       console.log(
-        `Missing fields! ${title ? "" : "title"} ${content ? "" : "content"} ${authorId ? "" : "authorId"}`,
+        `Missing fields! ${title ? "" : "title "}${content ? "" : "content "}${authorId ? "" : "authorId "}`,
       );
       return NextResponse.json(
         { error: "Missing required fields!" },
