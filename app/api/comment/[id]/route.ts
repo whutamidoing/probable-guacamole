@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 
+const ALLOWED_ORIGIN = "http://localhost:3000";
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -9,7 +11,15 @@ export async function GET(
   const { userId } = await auth();
 
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
   }
 
   const { id } = await params;
@@ -36,10 +46,25 @@ export async function GET(
   ]);
 
   if (!comment) {
-    return NextResponse.json({ error: "Comment not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Comment not found" },
+      {
+        status: 404,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
   }
 
-  return NextResponse.json({ ...comment, likesCount, isLiked: !!likeRecord });
+  return NextResponse.json(
+    { ...comment, likesCount, isLiked: !!likeRecord },
+    {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    },
+  );
 }
 
 export async function PATCH(
@@ -50,7 +75,15 @@ export async function PATCH(
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const body = await req.json();
@@ -59,7 +92,15 @@ export async function PATCH(
 
     if (!content) {
       console.error("No change to add");
-      return NextResponse.json({ error: "No change to add" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No change to add" },
+        {
+          status: 400,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const { id } = await params;
@@ -71,7 +112,15 @@ export async function PATCH(
     });
 
     if (!comment) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "User not found" },
+        {
+          status: 404,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     return NextResponse.json(comment);
@@ -92,7 +141,15 @@ export async function DELETE(
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const { id } = await params;
@@ -102,13 +159,38 @@ export async function DELETE(
     });
 
     if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Post not found" },
+        {
+          status: 404,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
   } catch (error) {
     console.error("POST /api/post/[id] error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
+}
+
+export async function OPTIONS() {
+  return new Response("OK", {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
 }

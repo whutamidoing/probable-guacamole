@@ -3,11 +3,21 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { Group } from "@prisma/client";
 
+const ALLOWED_ORIGIN = "http://localhost:3000";
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const body = await req.json();
@@ -18,7 +28,12 @@ export async function POST(req: NextRequest) {
       console.log("Missing fields!");
       return NextResponse.json(
         { error: "Missing required fields!" },
-        { status: 400 },
+        {
+          status: 400,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
       );
     }
     let group = await prisma.group.findUnique({ where: { groupName } });
@@ -27,7 +42,12 @@ export async function POST(req: NextRequest) {
       console.log("Group already exist!");
       return NextResponse.json(
         { error: "Group already exist!" },
-        { status: 400 },
+        {
+          status: 400,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
       );
     }
 
@@ -46,12 +66,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(group);
+    return NextResponse.json(group, {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    });
   } catch (error) {
     console.error("GROUP /api/group error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
 }
@@ -59,7 +88,15 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
   }
 
   const { searchParams } = new URL(req.url);
@@ -116,4 +153,16 @@ export async function GET(req: NextRequest) {
   }));
 
   return NextResponse.json(result);
+}
+
+export async function OPTIONS() {
+  return new Response("OK", {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
 }

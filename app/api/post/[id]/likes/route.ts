@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 
+const ALLOWED_ORIGIN = "http://localhost:3000";
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -14,7 +16,15 @@ export async function POST(
   const { type } = body;
 
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
   }
 
   const existing = await prisma.postLike.findUnique({
@@ -36,7 +46,14 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ liked: false });
+    return NextResponse.json(
+      { liked: false },
+      {
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
+    );
   }
 
   await prisma.postLike.create({
@@ -47,5 +64,24 @@ export async function POST(
     },
   });
 
-  return NextResponse.json({ liked: true });
+  return NextResponse.json(
+    { liked: true },
+    {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    },
+  );
+}
+
+export async function OPTIONS() {
+  return new Response("OK", {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
 }

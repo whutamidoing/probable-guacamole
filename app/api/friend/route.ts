@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 
+const ALLOWED_ORIGIN = "http://localhost:3000";
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const body = await req.json();
@@ -17,7 +27,12 @@ export async function POST(req: NextRequest) {
     if (!receiverId) {
       return NextResponse.json(
         { error: "Missing receiverId" },
-        { status: 400 },
+        {
+          status: 400,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
       );
     }
 
@@ -41,7 +56,12 @@ export async function POST(req: NextRequest) {
     if (existingFriend) {
       return NextResponse.json(
         { error: "Friend request already exists" },
-        { status: 409 },
+        {
+          status: 409,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
       );
     }
 
@@ -53,12 +73,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(friend);
+    return NextResponse.json(friend, {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    });
   } catch (error) {
     console.error("POST /api/friend error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
 }
@@ -68,7 +97,15 @@ export async function GET() {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const friends = await prisma.friend.findMany({
@@ -108,12 +145,33 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    });
   } catch (error) {
     console.error("FRIEND /api/friend/request error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
+}
+
+export async function OPTIONS() {
+  return new Response("OK", {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
 }

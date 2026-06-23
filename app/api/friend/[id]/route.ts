@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 
+const ALLOWED_ORIGIN = "http://localhost:3000";
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -10,7 +12,15 @@ export async function GET(
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const { id } = await params;
@@ -47,13 +57,22 @@ export async function GET(
       },
     });
 
-    return NextResponse.json(friendship); // null if none exists
+    return NextResponse.json(friendship, {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    }); // null if none exists
   } catch (error) {
     console.error("GET /api/friend/[id] error:", error);
 
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
 }
@@ -66,7 +85,15 @@ export async function PATCH(
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const body = await req.json();
@@ -75,7 +102,15 @@ export async function PATCH(
 
     if (!status) {
       console.error("Need a reply");
-      return NextResponse.json({ error: "Need a reply" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Need a reply" },
+        {
+          status: 400,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const { id } = await params;
@@ -87,15 +122,32 @@ export async function PATCH(
     });
 
     if (!friend) {
-      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Group not found" },
+        {
+          status: 404,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
-    return NextResponse.json(friend);
+    return NextResponse.json(friend, {
+      headers: {
+        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      },
+    });
   } catch (error) {
     console.error("FRIEND /api/friend/[id] error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
 }
@@ -108,7 +160,15 @@ export async function DELETE(
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        {
+          status: 401,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     const { id } = await params;
@@ -119,7 +179,15 @@ export async function DELETE(
     });
 
     if (!friend) {
-      return NextResponse.json({ error: "Friend not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Friend not found" },
+        {
+          status: 404,
+          headers: {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          },
+        },
+      );
     }
 
     return NextResponse.json(friend);
@@ -127,7 +195,24 @@ export async function DELETE(
     console.error("FRIEND /api/friend/[id] error:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
+      },
     );
   }
+}
+
+export async function OPTIONS() {
+  return new Response("OK", {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
 }
