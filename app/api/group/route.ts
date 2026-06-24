@@ -152,7 +152,11 @@ export async function GET(req: NextRequest) {
     isAdmin: group?.groupMembers[0]?.role === "admin",
   }));
 
-  return NextResponse.json(result);
+  return NextResponse.json(result, {
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+    },
+  });
 }
 
 export async function OPTIONS() {
