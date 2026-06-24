@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { Group } from "@prisma/client";
 
-const ALLOWED_ORIGIN = "http://localhost:3000";
+const ALLOWED_ORIGIN = "*";
 
 export async function POST(req: NextRequest) {
   try {
