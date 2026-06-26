@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   });
 
   const commentsWithLikes = await Promise.all(
-    comments.map(async (comment: Comment) => {
+    comments.map(async (comment) => {
       const likesCount = await prisma.commentLike.count({
         where: { commentId: comment.id },
       });
