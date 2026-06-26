@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
 
     const comment = await prisma.comment.create({
       data: { commenterId, content, postId },
+      include: {
+        commenter: true,
+      },
     });
 
     return NextResponse.json(comment, {
