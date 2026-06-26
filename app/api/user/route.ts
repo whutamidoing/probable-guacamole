@@ -73,7 +73,11 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany();
-  return NextResponse.json(users);
+  return NextResponse.json(users, {
+    headers: {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+    },
+  });
 }
 
 export async function OPTIONS() {
