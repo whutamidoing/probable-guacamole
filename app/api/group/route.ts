@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     console.log("Body received:", body);
     const { groupName, description, groupImg, bannerImg } = body;
 
-    if (!groupName || !description || !groupImg || !bannerImg) {
+    if (!groupName || !groupImg || !bannerImg) {
       console.log("Missing fields!");
       return NextResponse.json(
         { error: "Missing required fields!" },
