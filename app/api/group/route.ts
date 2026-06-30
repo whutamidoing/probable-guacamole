@@ -20,6 +20,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    console.log(user);
+
     const body = await req.json();
     console.log("Body received:", body);
     const { groupName, description, groupImg, bannerImg } = body;
