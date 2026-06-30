@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       where: { id: userId },
     });
 
-    console.log(user);
+    console.log(`${userId}: ${user}`);
 
     const body = await req.json();
     console.log("Body received:", body);
