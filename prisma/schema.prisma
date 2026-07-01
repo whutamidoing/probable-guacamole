@@ -25,6 +25,9 @@ model User {
   likedComments     CommentLike[]
   sentRequests      Friend[]        @relation("SentFriendReq")
   receivedRequests  Friend[]        @relation("ReceivedFriendReq")
+  senderMessages     Message[]       @relation("SenderMessages")  
+  receiverMessages   Message[]       @relation("ReceiverMessages")
+  conversations      Conversation[]  @relation("ConversationParticipants")
 
   groupMemberships GroupMember[]
 }
@@ -114,4 +117,22 @@ model CommentLike {
   likerId    String
   liker      User     @relation(fields: [likerId], references: [id])
   @@unique([commentId, likerId])
+}
+model Message {
+  id          Int       @id @default(autoincrement())
+  content     String
+  createdAt   DateTime  @default(now())
+  conversationId Int
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User      @relation("SenderMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User      @relation("ReceiverMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  @@unique([senderId, receiverId, createdAt])
+}
+model Conversation {
+  id          Int       @id @default(autoincrement())
+  participants User[]   @relation("ConversationParticipants")
+  messages     Message[]
+  createdAt    DateTime  @default(now())
 }

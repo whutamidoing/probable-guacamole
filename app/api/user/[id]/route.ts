@@ -39,9 +39,9 @@ export async function PATCH(
   try {
     const body = await req.json();
     console.log("Body received:", body);
-    let { fName, lName, bio, profileImg, bannerImg } = body;
+    let { userName, fName, lName, bio, profileImg, bannerImg } = body;
 
-    if (!fName && !lName && !bio && !profileImg && !bannerImg) {
+    if (!userName && !fName && !lName && !bio && !profileImg && !bannerImg) {
       console.error("No change to add");
       return NextResponse.json(
         { error: "No change to add" },
@@ -58,7 +58,7 @@ export async function PATCH(
 
     const user = await prisma.user.update({
       where: { id },
-      data: { fName, lName, bio, profileImg, bannerImg },
+      data: { userName, fName, lName, bio, profileImg, bannerImg },
     });
 
     if (!user) {
