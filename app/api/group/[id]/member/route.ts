@@ -93,15 +93,6 @@ export async function GET(req: NextRequest) {
 
   const members = await prisma.groupMember.findMany({
     where: { groupId: groupId ? Number(groupId) : undefined },
-    include: {
-      member: {
-        select: {
-          id: true,
-          userName: true,
-          profileImg: true,
-        },
-      },
-    },
   });
 
   return NextResponse.json(members, {
