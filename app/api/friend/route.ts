@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-
-const ALLOWED_ORIGIN = "http://localhost:3000";
+import { getCorsOrigin } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +13,7 @@ export async function POST(req: NextRequest) {
         {
           status: 401,
           headers: {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+            "Access-Control-Allow-Origin": getCorsOrigin(req),
           },
         },
       );
@@ -30,7 +29,7 @@ export async function POST(req: NextRequest) {
         {
           status: 400,
           headers: {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+            "Access-Control-Allow-Origin": getCorsOrigin(req),
           },
         },
       );
@@ -59,7 +58,7 @@ export async function POST(req: NextRequest) {
         {
           status: 409,
           headers: {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+            "Access-Control-Allow-Origin": getCorsOrigin(req),
           },
         },
       );
@@ -75,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(friend, {
       headers: {
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        "Access-Control-Allow-Origin": getCorsOrigin(req),
       },
     });
   } catch (error) {
@@ -85,14 +84,14 @@ export async function POST(req: NextRequest) {
       {
         status: 500,
         headers: {
-          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          "Access-Control-Allow-Origin": getCorsOrigin(req),
         },
       },
     );
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
 
@@ -102,7 +101,7 @@ export async function GET() {
         {
           status: 401,
           headers: {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+            "Access-Control-Allow-Origin": getCorsOrigin(req),
           },
         },
       );
@@ -147,7 +146,7 @@ export async function GET() {
 
     return NextResponse.json(result, {
       headers: {
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        "Access-Control-Allow-Origin": getCorsOrigin(req),
       },
     });
   } catch (error) {
@@ -157,18 +156,18 @@ export async function GET() {
       {
         status: 500,
         headers: {
-          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          "Access-Control-Allow-Origin": getCorsOrigin(req),
         },
       },
     );
   }
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(req: NextRequest) {
   return new Response("OK", {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Origin": getCorsOrigin(req),
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Allow-Credentials": "true",

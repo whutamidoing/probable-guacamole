@@ -1,10 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
+import { getCorsOrigin } from "@/lib/db";
 
-const ALLOWED_ORIGIN = "http://localhost:3000";
-
-export async function GET() {
+export async function GET(req: NextRequest) {
   const { userId } = await auth();
 
   if (!userId) {
@@ -13,7 +12,7 @@ export async function GET() {
       {
         status: 401,
         headers: {
-          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+          "Access-Control-Allow-Origin": getCorsOrigin(req),
         },
       },
     );
@@ -44,16 +43,16 @@ export async function GET() {
 
   return NextResponse.json(result, {
     headers: {
-      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Origin": getCorsOrigin(req),
     },
   });
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(req: NextRequest) {
   return new Response("OK", {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Origin": getCorsOrigin(req),
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Allow-Credentials": "true",
