@@ -73,6 +73,44 @@ export async function POST(
   );
 }
 
+export async function GET(req: NextRequest) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      {
+        status: 401,
+        headers: {
+          "Access-Control-Allow-Origin": getCorsOrigin(req),
+        },
+      },
+    );
+  }
+
+  const { searchParams } = new URL(req.url);
+  const groupId = searchParams.get("groupId");
+
+  const members = await prisma.groupMember.findMany({
+    where: { groupId: groupId ? Number(groupId) : undefined },
+    include: {
+      member: {
+        select: {
+          id: true,
+          userName: true,
+          profileImg: true,
+        },
+      },
+    },
+  });
+
+  return NextResponse.json(members, {
+    headers: {
+      "Access-Control-Allow-Origin": getCorsOrigin(req),
+    },
+  });
+}
+
 export async function OPTIONS(req: NextRequest) {
   return new Response("OK", {
     status: 200,
