@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
   const postId = Number(searchParams.get("postId"));
 
   const comments = await prisma.comment.findMany({
-    where: { postId: postId || undefined, parentId: null },
+    where: { postId: postId || undefined },
     include: {
       commenter: {
         select: {
