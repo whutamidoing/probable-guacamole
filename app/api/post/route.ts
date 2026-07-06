@@ -37,7 +37,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("Body received:", body);
 
-    const { title, content, tags, images, authorId, status, groupId } = body;
+    const {
+      title,
+      content,
+      tags,
+      images,
+      authorId,
+      status,
+      groupId,
+      parentId,
+    } = body;
 
     if (!title || !authorId || (!content && images.length === 0)) {
       console.log(
@@ -64,7 +73,16 @@ export async function POST(req: NextRequest) {
 
     if (!post) {
       post = await prisma.post.create({
-        data: { title, content, tags, images, authorId, status, groupId },
+        data: {
+          title,
+          content,
+          tags,
+          images,
+          authorId,
+          status,
+          groupId,
+          parentId,
+        },
       });
     }
 
