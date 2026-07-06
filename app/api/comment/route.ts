@@ -82,15 +82,10 @@ export async function GET(req: NextRequest) {
   const comments = await prisma.comment.findMany({
     where: { postId: postId || undefined, parentId: null },
     include: {
-      commenter: true,
-      replies: {
-        include: {
-          commenter: {
-            select: {
-              userName: true,
-              profileImg: true,
-            },
-          },
+      commenter: {
+        select: {
+          userName: true,
+          profileImg: true,
         },
       },
     },
@@ -119,7 +114,9 @@ export async function GET(req: NextRequest) {
     }),
   );
 
-  return NextResponse.json(commentsWithLikes, {
+  const tree = buildTree(commentsWithLikes);
+
+  return NextResponse.json(tree, {
     headers: {
       "Access-Control-Allow-Origin": getCorsOrigin(req),
     },
@@ -136,4 +133,29 @@ export async function OPTIONS(req: NextRequest) {
       "Access-Control-Allow-Credentials": "true",
     },
   });
+}
+
+function buildTree(comments: Comment[]) {
+  const map = new Map();
+
+  comments.forEach((c) => {
+    map.set(c.id, {
+      ...c,
+      replies: [],
+    });
+  });
+
+  const roots: Comment[] = [];
+
+  comments.forEach((c) => {
+    const node = map.get(c.id);
+
+    if (c.parentId) {
+      map.get(c.parentId)?.replies.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+
+  return roots;
 }
