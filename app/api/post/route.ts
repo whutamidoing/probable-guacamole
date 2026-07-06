@@ -37,16 +37,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log("Body received:", body);
 
-    const {
-      title,
-      content,
-      tags,
-      images,
-      authorId,
-      status,
-      groupId,
-      parentId,
-    } = body;
+    const { title, content, tags, images, authorId, status, groupId } = body;
 
     if (!title || !authorId || (!content && images.length === 0)) {
       console.log(
@@ -81,7 +72,6 @@ export async function POST(req: NextRequest) {
           authorId,
           status,
           groupId,
-          parentId,
         },
       });
     }
@@ -136,16 +126,6 @@ export async function GET(req: NextRequest) {
           select: {
             userName: true,
             profileImg: true,
-          },
-        },
-        replies: {
-          include: {
-            author: {
-              select: {
-                userName: true,
-                profileImg: true,
-              },
-            },
           },
         },
         likedPost: {

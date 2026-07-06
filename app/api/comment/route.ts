@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     console.log("Body received:", body);
-    let { content, postId, commenterId } = body;
+    let { content, postId, commenterId, parentId } = body;
 
     if (!content || !postId || !userId) {
       console.log("Missing fields!");
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     const comment = await prisma.comment.create({
-      data: { commenterId, content, postId },
+      data: { commenterId, content, postId, parentId },
       include: {
         commenter: true,
       },
@@ -81,7 +81,19 @@ export async function GET(req: NextRequest) {
 
   const comments = await prisma.comment.findMany({
     where: { postId: postId || undefined },
-    include: { commenter: true },
+    include: {
+      commenter: true,
+      replies: {
+        include: {
+          commenter: {
+            select: {
+              userName: true,
+              profileImg: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   const commentsWithLikes = await Promise.all(
