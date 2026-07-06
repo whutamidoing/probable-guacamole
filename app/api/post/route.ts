@@ -111,12 +111,23 @@ export async function GET(req: NextRequest) {
       where: {
         authorId: authorId ? authorId : undefined,
         groupId: groupId ? Number(groupId) : undefined,
+        parentId: null,
       },
       include: {
         author: {
           select: {
             userName: true,
             profileImg: true,
+          },
+        },
+        replies: {
+          include: {
+            author: {
+              select: {
+                userName: true,
+                profileImg: true,
+              },
+            },
           },
         },
         likedPost: {
