@@ -119,7 +119,6 @@ export async function GET(req: NextRequest) {
       where: {
         authorId: authorId ? authorId : undefined,
         groupId: groupId ? Number(groupId) : undefined,
-        parentId: null,
       },
       include: {
         author: {
