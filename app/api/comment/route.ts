@@ -116,6 +116,8 @@ export async function GET(req: NextRequest) {
 
   const tree = buildTree(commentsWithLikes);
 
+  console.log("GET /api/comments response:", tree);
+
   return NextResponse.json(tree, {
     headers: {
       "Access-Control-Allow-Origin": getCorsOrigin(req),
