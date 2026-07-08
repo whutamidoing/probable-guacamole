@@ -58,23 +58,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let post = await prisma.post.findFirst({
-      where: { title },
+    const post = await prisma.post.create({
+      data: {
+        title,
+        content,
+        tags,
+        images,
+        authorId,
+        status,
+        groupId,
+      },
     });
-
-    if (!post) {
-      post = await prisma.post.create({
-        data: {
-          title,
-          content,
-          tags,
-          images,
-          authorId,
-          status,
-          groupId,
-        },
-      });
-    }
 
     return NextResponse.json(post, {
       headers: {
