@@ -52,6 +52,9 @@ export async function createMessage(
       senderId,
       conversationId,
     },
+    include: {
+      sender: true,
+    },
   });
   return message;
 }
