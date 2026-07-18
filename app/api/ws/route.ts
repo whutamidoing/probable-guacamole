@@ -45,7 +45,7 @@ export async function GET() {
           receiverSocket.send(
             JSON.stringify({
               type: "message",
-              MessageChannel,
+              message,
             }),
           );
         }
