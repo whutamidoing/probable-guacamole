@@ -49,7 +49,6 @@ export async function findOrCreateConversation(
         create: {
           content,
           senderId,
-          receiverId,
         },
       },
     },
