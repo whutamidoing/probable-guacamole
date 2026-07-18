@@ -19,8 +19,6 @@ export async function GET() {
         }
 
         if (payload.type === "authenticate") {
-          console.log("AUTHENTICATING USER:", payload.userId);
-
           connectedUsers.set(payload.userId, ws);
 
           console.log("CONNECTED USERS:", [...connectedUsers.keys()]);
@@ -45,12 +43,9 @@ export async function GET() {
 
         const receiverSocket = connectedUsers.get(receiverId);
 
-        console.log("MESSAGE BEFORE SEND:", message);
         console.log("RECEIVER SOCKET EXISTS:", !!receiverSocket);
 
         if (receiverSocket) {
-          console.log("SENDING TO RECEIVER:", message);
-
           receiverSocket.send(
             JSON.stringify({
               type: "message",
@@ -58,8 +53,6 @@ export async function GET() {
             }),
           );
         }
-
-        console.log("SENDING TO SENDER:", message);
 
         ws.send(
           JSON.stringify({

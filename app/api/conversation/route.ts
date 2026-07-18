@@ -90,8 +90,10 @@ export async function GET(req: NextRequest) {
       where: { participants: { some: { participantId: userId ?? undefined } } },
       include: {
         participants: {
-          where: {
-            participantId,
+          include: {
+            participant: {
+              select: { userName: true, profileImg: true },
+            },
           },
         },
       },
