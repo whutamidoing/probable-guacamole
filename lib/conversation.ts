@@ -45,7 +45,6 @@ export async function createMessage(
   senderId: string,
   conversationId: number,
 ) {
-  console.log("NEW createMessage VERSION 2026-07-18");
   const message = await prisma.message.create({
     data: {
       content,

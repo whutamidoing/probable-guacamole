@@ -19,7 +19,11 @@ export async function GET() {
         }
 
         if (payload.type === "authenticate") {
+          console.log("AUTHENTICATING USER:", payload.userId);
+
           connectedUsers.set(payload.userId, ws);
+
+          console.log("CONNECTED USERS:", [...connectedUsers.keys()]);
 
           ws.send(
             JSON.stringify({
