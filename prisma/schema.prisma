@@ -11,9 +11,9 @@ datasource db {
 }
 
 model User { 
-  id                String           @id @default(uuid())
-  email             String           @unique
-  userName          String           @unique
+  id                String                     @id @default(uuid())
+  email             String                     @unique
+  userName          String                     @unique
   bio               String?
   fName             String?
   lName             String?
@@ -23,13 +23,11 @@ model User {
   comments          Comment[]
   likedPost         PostLike[]
   likedComments     CommentLike[]
-  sentRequests      Friend[]        @relation("SentFriendReq")
-  receivedRequests  Friend[]        @relation("ReceivedFriendReq")
-  senderMessages     Message[]       @relation("SenderMessages")  
-  receiverMessages   Message[]       @relation("ReceiverMessages")
-  conversations      Conversation[]  @relation("ConversationParticipants")
-
-  groupMemberships GroupMember[]
+  conversations     ConversationParticipant[]
+  groupMemberships  GroupMember[]
+  sentRequests      Friend[]                   @relation("SentFriendReq")
+  receivedRequests  Friend[]                   @relation("ReceivedFriendReq")
+  senderMessages    Message[]                  @relation("SenderMessages")
 }
 model Post { 
   id             Int       @id @default(autoincrement()) 
@@ -123,20 +121,32 @@ model CommentLike {
   @@unique([commentId, likerId])
 }
 model Message {
-  id          Int       @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   content     String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime      @default(now())
   conversationId Int
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   senderId    String
-  sender      User      @relation("SenderMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiverId  String
-  receiver    User      @relation("ReceiverMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  @@unique([senderId, receiverId, createdAt])
+  sender      User          @relation("SenderMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  parentId    Int?
+  parent      Message?      @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Message[]     @relation("MessageReplies")
+  @@unique([senderId, createdAt])
 }
 model Conversation {
-  id          Int       @id @default(autoincrement())
-  participants User[]   @relation("ConversationParticipants")
-  messages     Message[]
-  createdAt    DateTime  @default(now())
+  id            Int @id @default(autoincrement())
+  isGroup       Boolean
+  participants  ConversationParticipant[]
+  messages      Message[]
+}
+
+model ConversationParticipant {
+  conversationId Int
+  participantId         String
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  participant         User         @relation(fields: [participantId], references: [id])
+
+  @@id([conversationId, participantId])
 }
