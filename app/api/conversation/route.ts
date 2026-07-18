@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { getCorsOrigin } from "@/lib/db";
-import { Conversation } from "@prisma/client";
+import { Conversation, ConversationParticipant } from "@prisma/client";
 import { findOrCreateConversation } from "@/lib/conversation";
 
 export async function POST(req: NextRequest) {
@@ -41,11 +41,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const conversation = await findOrCreateConversation(
-      participants,
-      message,
-      userId,
+    const receiverId = participants.find(
+      (participant: ConversationParticipant) =>
+        participant.participantId !== userId,
     );
+
+    const conversation = await findOrCreateConversation([userId, receiverId]);
 
     return NextResponse.json(conversation, {
       headers: {

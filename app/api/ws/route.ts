@@ -32,11 +32,10 @@ export async function GET() {
 
         const { content, senderId, receiverId } = payload;
 
-        const conversation = await findOrCreateConversation(
-          [senderId, receiverId],
-          content,
+        const conversation = await findOrCreateConversation([
           senderId,
-        );
+          receiverId,
+        ]);
 
         const message = await createMessage(content, senderId, conversation.id);
 

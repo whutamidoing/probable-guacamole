@@ -1,41 +1,29 @@
 import { prisma } from "./db";
 
-export async function findOrCreateConversation(
-  participants: string[],
-  content: string,
-  senderId: string,
-) {
-  const sortedParticipants = [...participants].sort();
-
-  const existingConversations = await prisma.conversation.findMany({
+export async function findOrCreateConversation(participants: string[]) {
+  const existingConversation = await prisma.conversation.findFirst({
     where: {
       isGroup: false,
+
       participants: {
         every: {
           participantId: {
-            in: sortedParticipants,
+            in: participants,
           },
         },
       },
     },
+
     include: {
       participants: true,
     },
   });
 
-  if (existingConversations.length > 0) {
-    return existingConversations[0];
+  if (existingConversation) {
+    return existingConversation;
   }
 
-  const receiverId = participants.find(
-    (participantId) => participantId !== senderId,
-  );
-
-  if (!receiverId) {
-    throw new Error("Could not find receiver");
-  }
-
-  const conversation = await prisma.conversation.create({
+  return prisma.conversation.create({
     data: {
       isGroup: participants.length > 2,
 
@@ -44,22 +32,12 @@ export async function findOrCreateConversation(
           participantId,
         })),
       },
-
-      messages: {
-        create: {
-          content,
-          senderId,
-        },
-      },
     },
 
     include: {
       participants: true,
-      messages: true,
     },
   });
-
-  return conversation;
 }
 
 export async function createMessage(
