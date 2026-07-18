@@ -72,7 +72,7 @@ export async function createMessage(
       content,
       senderId,
       conversationId,
-      createdAt: new Date().toLocaleDateString("en-US"),
+      createdAt: new Date(),
     },
   });
   return message;
