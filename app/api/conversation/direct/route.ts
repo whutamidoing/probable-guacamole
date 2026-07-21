@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
   });
 
   const result = conversation;
+  console.log("Returning DM: ", conversation);
 
   return NextResponse.json(result, {
     headers: {

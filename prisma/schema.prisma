@@ -142,11 +142,11 @@ model Conversation {
 }
 
 model ConversationParticipant {
-  conversationId Int
-  participantId         String
+  conversationId  Int
+  participantId   String
 
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-  participant         User         @relation(fields: [participantId], references: [id])
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  participant     User         @relation(fields: [participantId], references: [id])
 
   @@id([conversationId, participantId])
 }
